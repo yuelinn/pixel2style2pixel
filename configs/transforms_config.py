@@ -162,22 +162,27 @@ class SegToImageTransformsRandCrop(TransformsConfig):
 	def get_transforms(self):
 		# images are to be cropped to desired ROI before using this function in datasets/images_dataset.py
 		size=128  # size of input to network. 
+		# moved tensor casting and normalisation to images_dataset.py
 		transforms_dict = {
 			'transform_gt_train': transforms.Compose([
 				transforms.Resize((size, size)),
 				# transforms.ToTensor(),
-				transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]),
+				# transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+				]),
 			'transform_source': transforms.Compose([
 				transforms.Resize((size, size)),
 				# transforms.ToTensor(),
-				transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]),
+				# transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+				]),
 			'transform_test': transforms.Compose([
 				transforms.Resize((size, size)),
 				# transforms.ToTensor(),
-				transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]),
+				# transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+				]),
 			'transform_inference': transforms.Compose([
 				transforms.Resize((size, size)),
 				# transforms.ToTensor(),
-				transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]),
+				# transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+				]),
 		}
 		return transforms_dict

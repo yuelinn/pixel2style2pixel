@@ -27,18 +27,23 @@ class ImagesDataset(Dataset):
 
 		return self.preprocess(from_tensor, to_tensor)
 
-	def preprocess(self, from_im, to_im):
+	def preprocess(self, from_im, to_im, normalize=True):
 		crop_size = 512
+		normalize_transform = transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
 		# perform random crop 
 		crop_params=transforms.RandomCrop.get_params(to_im, (crop_size,crop_size))
 
 		if self.target_transform:
 			to_im = transforms.functional.crop(to_im, crop_params[0], crop_params[1], crop_params[2], crop_params[3])
 			to_im = self.target_transform(to_im)
+			if normalize:
+				to_im = normalize_transform(to_im)
 
 		if self.source_transform:
 			from_im = transforms.functional.crop(from_im, crop_params[0], crop_params[1], crop_params[2], crop_params[3])
 			from_im = self.source_transform(from_im)
+			if normalize:
+				from_im = normalize_transform(from_im)
 		else:
 			from_im = to_im
 

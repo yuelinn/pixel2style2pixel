@@ -243,10 +243,9 @@ class Coach:
 			fake_img, des_latent = self.net.decoder.forward([noise], return_latents=True)
 			fake_img = fake_img.detach()
 			des_latent = des_latent.detach()
-			fake_img_processed, _ = self.train_dataset.preprocess(fake_img, fake_img)  # perform preprocessing
+			fake_img_processed, _ = self.train_dataset.preprocess(fake_img, fake_img, normalize=False)  # perform preprocessing
 			_, latent = self.net.forward(fake_img_processed, return_latents=True)
-			loss_img_w_pairs = F.mse_loss(latent, des_latent)
-			# loss_img_w_pairs = self.img_w_loss(latent, des_latent)
+			loss_img_w_pairs = self.img_w_loss(latent, des_latent)
 			loss_dict["loss_img_w_pairs"] = float(loss_img_w_pairs)
 			loss += loss_img_w_pairs * self.opts.img_w_pairs_lambda
 
