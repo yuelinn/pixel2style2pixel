@@ -38,4 +38,11 @@ DATASETS = {
 		'test_source_root': dataset_paths['celeba_test'],
 		'test_target_root': dataset_paths['celeba_test'],
 	},
+	'plants_seg_to_real_uav': {   # use this transform for plants. sorry the name is misleading...
+		'transforms': transforms_config.SegToImageTransformsRandCrop,
+		'train_source_root': dataset_paths['plant_train'],
+		'train_target_root': dataset_paths['plant_train'],
+		'test_source_root': dataset_paths['plant_test'],
+		'test_target_root': dataset_paths['plant_test'],
+	}
 }
