@@ -1,7 +1,7 @@
 from torch.utils.data import Dataset
 from PIL import Image
 from utils import data_utils
-
+import torchvision.transforms as transforms
 
 class ImagesDataset(Dataset):
 
@@ -18,14 +18,26 @@ class ImagesDataset(Dataset):
 	def __getitem__(self, index):
 		from_path = self.source_paths[index]
 		from_im = Image.open(from_path)
-		from_im = from_im.convert('RGB') if self.opts.label_nc == 0 else from_im.convert('L')
+		from_im = from_im.convert('RGB') # if self.opts.label_nc == 0 else from_im.convert('L')
+		from_tensor = transforms.ToTensor()(from_im)
 
 		to_path = self.target_paths[index]
 		to_im = Image.open(to_path).convert('RGB')
+		to_tensor = transforms.ToTensor()(to_im)
+
+		return self.preprocess(from_tensor, to_tensor)
+
+	def preprocess(self, from_im, to_im):
+		crop_size = 512
+		# perform random crop 
+		crop_params=transforms.RandomCrop.get_params(to_im, (crop_size,crop_size))
+
 		if self.target_transform:
+			to_im = transforms.functional.crop(to_im, crop_params[0], crop_params[1], crop_params[2], crop_params[3])
 			to_im = self.target_transform(to_im)
 
 		if self.source_transform:
+			from_im = transforms.functional.crop(from_im, crop_params[0], crop_params[1], crop_params[2], crop_params[3])
 			from_im = self.source_transform(from_im)
 		else:
 			from_im = to_im
