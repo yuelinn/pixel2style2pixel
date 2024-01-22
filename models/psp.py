@@ -52,14 +52,6 @@ class pSp(nn.Module):
 			self.decoder.load_state_dict(get_keys(ckpt, 'decoder'), strict=True)
 			self.__load_latent_avg(ckpt)
 		else:
-			# print('Loading encoders weights from irse50!')
-			# encoder_ckpt = torch.load(model_paths['ir_se50'])
-			print('Loading encoders weights from stylegan ffhq!')
-			encoder_ckpt = torch.load(model_paths['stylegan_ffhq'])
-			# if input to encoder is not an RGB image, do not load the input layer weights
-			if self.opts.label_nc != 0:
-				encoder_ckpt = {k: v for k, v in encoder_ckpt.items() if "input_layer" not in k}
-			self.encoder.load_state_dict(encoder_ckpt, strict=False)
 			print('Loading decoder weights from pretrained!')
 			ckpt = torch.load(self.opts.stylegan_weights)
 			self.decoder.load_state_dict(ckpt['g_ema'], strict=False)
@@ -92,7 +84,7 @@ class pSp(nn.Module):
 				else:
 					codes[:, i] = 0
 
-		input_is_latent = not input_code
+		input_is_latent = True  # always put in w/w++ not z
 		images, result_latent = self.decoder([codes],
 		                                     input_is_latent=input_is_latent,
 		                                     randomize_noise=randomize_noise,
