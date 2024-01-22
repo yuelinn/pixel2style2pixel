@@ -50,6 +50,9 @@ class TrainOptions:
 		# arguments for super-resolution
 		self.parser.add_argument('--resize_factors', type=str, default=None, help='For super-res, comma-separated resize factors to use for inference.')
 
+		# argument for training using generated image-latent pairs
+		self.parser.add_argument('--img_w_pairs_lambda', default=1.0, type=float, help="image-latent loss multiplier factor")
+
 	def parse(self):
 		opts = self.parser.parse_args()
 		return opts
