@@ -11,13 +11,12 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.nn.functional as F
 
 from utils import common, train_utils
-from criteria import id_loss, w_norm, moco_loss
+from criteria import id_loss, w_norm, moco_loss, img_w_loss
 from configs import data_configs
 from datasets.images_dataset import ImagesDataset
 from criteria.lpips.lpips import LPIPS
 from models.psp import pSp
 from training.ranger import Ranger
-
 
 class Coach:
 	def __init__(self, opts):
@@ -52,6 +51,8 @@ class Coach:
 			self.w_norm_loss = w_norm.WNormLoss(start_from_latent_avg=self.opts.start_from_latent_avg)
 		if self.opts.moco_lambda > 0:
 			self.moco_loss = moco_loss.MocoLoss().to(self.device).eval()
+		if self.opts.img_w_pairs_lambda > 0:
+			self.img_w_loss = img_w_loss.ImgWLoss().to(self.device).eval()
 
 		# Initialize optimizer
 		self.optimizer = self.configure_optimizers()
@@ -237,6 +238,17 @@ class Coach:
 			loss_dict['loss_moco'] = float(loss_moco)
 			loss_dict['id_improve'] = float(sim_improvement)
 			loss += loss_moco * self.opts.moco_lambda
+		if self.opts.img_w_pairs_lambda > 0:
+			noise = (torch.rand(self.opts.batch_size, 512, device=self.device))  # generate noise the size of latent variable corresp to StyleGAN2's encoder input size
+			fake_img, des_latent = self.net.decoder.forward([noise], return_latents=True)
+			fake_img = fake_img.detach()
+			des_latent = des_latent.detach()
+			fake_img_processed, _ = self.train_dataset.preprocess(fake_img, fake_img)  # perform preprocessing
+			_, latent = self.net.forward(fake_img_processed, return_latents=True)
+			loss_img_w_pairs = F.mse_loss(latent, des_latent)
+			# loss_img_w_pairs = self.img_w_loss(latent, des_latent)
+			loss_dict["loss_img_w_pairs"] = float(loss_img_w_pairs)
+			loss += loss_img_w_pairs * self.opts.img_w_pairs_lambda
 
 		loss_dict['loss'] = float(loss)
 		return loss, loss_dict, id_logs
