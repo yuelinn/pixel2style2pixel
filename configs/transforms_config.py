@@ -161,6 +161,7 @@ class SegToImageTransformsRandCrop(TransformsConfig):
 
 	def get_transforms(self):
 		# images are to be cropped to desired ROI before using this function in datasets/images_dataset.py
+		# images are cropped to size 512 before resizing, depending on the script using the data
 		size=128  # size of input to network. 
 		# moved tensor casting and normalisation to images_dataset.py
 		transforms_dict = {
