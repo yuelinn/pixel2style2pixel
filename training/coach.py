@@ -267,7 +267,7 @@ class Coach:
 		im_data = []
 		for i in range(display_count):
 			cur_im_data = {
-				'input_face': common.log_input_image(x[i], self.opts),
+				'input_face': common.tensor2im(x[i]),
 				'target_face': common.tensor2im(y[i]),
 				'output_face': common.tensor2im(y_hat[i]),
 			}
